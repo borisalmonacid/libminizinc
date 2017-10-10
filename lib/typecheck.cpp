@@ -481,8 +481,8 @@ namespace MiniZinc {
     case Expression::E_ARRAYLIT:
       {
         ArrayLit* al = e->cast<ArrayLit>();
-        for (unsigned int i=0; i<al->v().size(); i++)
-          run(env, al->v()[i]);
+        for (unsigned int i=0; i<al->size(); i++)
+          run(env, al->element(i));
       }
       break;
     case Expression::E_ARRAYACCESS:
@@ -736,8 +736,8 @@ namespace MiniZinc {
       Type ty; ty.dim(al.dims());
       std::vector<AnonVar*> anons;
       bool haveInferredType = false;
-      for (unsigned int i=0; i<al.v().size(); i++) {
-        Expression* vi = al.v()[i];
+      for (unsigned int i=0; i<al.size(); i++) {
+        Expression* vi = al.element(i);
         if (vi->type().dim() > 0)
           throw TypeError(_env,vi->loc(),"arrays cannot be elements of arrays");
         
@@ -811,8 +811,9 @@ namespace MiniZinc {
         for (unsigned int i=0; i<anons.size(); i++) {
           anons[i]->type(at);
         }
-        for (unsigned int i=0; i<al.v().size(); i++) {
-          al.v()[i] = addCoercion(_env, _model, al.v()[i], at)();
+        for (unsigned int i=0; i<al.size(); i++) {
+          Expression* e = al.element(i);
+          e = addCoercion(_env, _model, al.element(i), at)();
         }
       }
       if (ty.enumId() != 0) {

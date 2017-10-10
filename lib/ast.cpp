@@ -102,7 +102,7 @@ namespace MiniZinc {
           pushstack(cur->cast<Id>()->decl());
           break;
         case Expression::E_ARRAYLIT:
-          pushall(cur->cast<ArrayLit>()->v());
+          pushall(cur->cast<ArrayLit>()->_v);
           cur->cast<ArrayLit>()->_dims.mark();
           break;
         case Expression::E_ARRAYACCESS:
@@ -962,15 +962,15 @@ namespace MiniZinc {
       {
         const ArrayLit* a0 = e0->cast<ArrayLit>();
         const ArrayLit* a1 = e1->cast<ArrayLit>();
-        if (a0->v().size() != a1->v().size()) return false;
+        if (a0->size() != a1->size()) return false;
         if (a0->_dims.size() != a1->_dims.size()) return false;
         for (unsigned int i=0; i<a0->_dims.size(); i++) {
           if ( a0->_dims[i] != a1->_dims[i] ) {
             return false;
           }
         }
-        for (unsigned int i=0; i<a0->v().size(); i++) {
-          if (!Expression::equal( a0->v()[i], a1->v()[i] )) {
+        for (unsigned int i=0; i<a0->size(); i++) {
+          if (!Expression::equal( a0->element(i), a1->element(i) )) {
             return false;
           }
         }

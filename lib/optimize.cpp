@@ -318,8 +318,8 @@ namespace MiniZinc {
                 envi.flat_removeItem(i);
               } else if (c->id()==constants().ids.forall) {
                 ArrayLit* al = follow_id(c->args()[0])->cast<ArrayLit>();
-                for (unsigned int j=al->v().size(); j--;) {
-                  if (Id* id = al->v()[j]->dyn_cast<Id>()) {
+                for (unsigned int j=al->size(); j--;) {
+                  if (Id* id = al->element(j)->dyn_cast<Id>()) {
                     if (id->decl()->ti()->domain()==NULL) {
                       toAssignBoolVars.push_back(envi.vo.idx.find(id->decl()->id())->second);
                     } else if (id->decl()->ti()->domain() == constants().lit_false) {
@@ -399,8 +399,8 @@ namespace MiniZinc {
         for (unsigned int j=0; j<c->args().size(); j++) {
           bool unit = (j==0 ? isConjunction : !isConjunction);
           ArrayLit* al = follow_id(c->args()[j])->cast<ArrayLit>();
-          for (unsigned int k=0; k<al->v().size(); k++) {
-            if (Id* ident = al->v()[k]->dyn_cast<Id>()) {
+          for (unsigned int k=0; k<al->size(); k++) {
+            if (Id* ident = al->element(k)->dyn_cast<Id>()) {
               if (ident->decl()->ti()->domain() ||
                   (ident->decl()->e() && ident->decl()->e()->type().ispar()) ) {
                 bool identValue = ident->decl()->ti()->domain() ?
@@ -420,7 +420,7 @@ namespace MiniZinc {
                   neg.push_back(ident->decl());
               }
             } else {
-              if (al->v()[k]->cast<BoolLit>()->v()!=unit) {
+              if (al->element(k)->cast<BoolLit>()->v()!=unit) {
                 subsumed = true;
                 goto subsumed_check_done;
               }
@@ -537,8 +537,8 @@ namespace MiniZinc {
                 if (isTrue && c->id()==constants().ids.forall) {
                   remove = true;
                   ArrayLit* al = follow_id(c->args()[0])->cast<ArrayLit>();
-                  for (unsigned int i=0; i<al->v().size(); i++) {
-                    if (Id* id = al->v()[i]->dyn_cast<Id>()) {
+                  for (unsigned int i=0; i<al->size(); i++) {
+                    if (Id* id = al->element(i)->dyn_cast<Id>()) {
                       if (id->decl()->ti()->domain()==NULL) {
                         id->decl()->ti()->domain(constants().lit_true);
                         pushVarDecl(envi, envi.vo.idx.find(id->decl()->id())->second, vardeclQueue);
@@ -553,8 +553,8 @@ namespace MiniZinc {
                   for (unsigned int i=0; i<c->args().size(); i++) {
                     bool ispos = i==0;
                     ArrayLit* al = follow_id(c->args()[i])->cast<ArrayLit>();
-                    for (unsigned int j=0; j<al->v().size(); j++) {
-                      if (Id* id = al->v()[j]->dyn_cast<Id>()) {
+                    for (unsigned int j=0; j<al->size(); j++) {
+                      if (Id* id = al->element(j)->dyn_cast<Id>()) {
                         if (id->decl()->ti()->domain()==NULL) {
                           id->decl()->ti()->domain(constants().boollit(!ispos));
                           pushVarDecl(envi, envi.vo.idx.find(id->decl()->id())->second, vardeclQueue);
@@ -672,8 +672,8 @@ namespace MiniZinc {
           bool unit = (j==0 ? isConjunction : !isConjunction);
           ArrayLit* al = follow_id(c->args()[j])->cast<ArrayLit>();
           std::vector<Expression*> compactedAl;
-          for (unsigned int k=0; k<al->v().size(); k++) {
-            if (Id* ident = al->v()[k]->dyn_cast<Id>()) {
+          for (unsigned int k=0; k<al->size(); k++) {
+            if (Id* ident = al->element(k)->dyn_cast<Id>()) {
               if (ident->decl()->ti()->domain()) {
                 if (!(ident->decl()->ti()->domain()==constants().boollit(unit))) {
                   subsumed = true;
@@ -683,12 +683,12 @@ namespace MiniZinc {
                 compactedAl.push_back(ident);
               }
             } else {
-              if (al->v()[k]->cast<BoolLit>()->v()!=unit) {
+              if (al->element(k)->cast<BoolLit>()->v()!=unit) {
                 subsumed = true;
               }
             }
           }
-          if (compactedAl.size() < al->v().size()) {
+          if (compactedAl.size() < al->size()) {
             c->args()[j] = new ArrayLit(al->loc(), compactedAl);
             c->args()[j]->type(Type::varbool(1));
           }
@@ -699,8 +699,8 @@ namespace MiniZinc {
               env.envi().fail();
             } else {
               ArrayLit* al = follow_id(c->args()[0])->cast<ArrayLit>();
-              for (unsigned int j=0; j<al->v().size(); j++) {
-                removedVarDecls.push_back(al->v()[j]->cast<Id>()->decl());
+              for (unsigned int j=0; j<al->size(); j++) {
+                removedVarDecls.push_back(al->element(j)->cast<Id>()->decl());
               }
               bi->cast<VarDeclI>()->e()->ti()->domain(constants().lit_false);
               bi->cast<VarDeclI>()->e()->ti()->setComputedDomain(true);
@@ -806,8 +806,9 @@ namespace MiniZinc {
   public:
     /// Visit array literal
     void vArrayLit(const ArrayLit& al) {
-      for (unsigned int i=0; i<al.v().size(); i++) {
-        al.v()[i] = subst(al.v()[i]);
+      for (unsigned int i=0; i<al.size(); i++) {
+        Expression* e = al.element(i);
+        e = subst(al.element(i));
       }
     }
     /// Visit call
@@ -1201,9 +1202,9 @@ namespace MiniZinc {
       int nonFixedVars = 0;
       for (unsigned int i=0; i<c->args().size(); i++) {
         ArrayLit* al = follow_id(c->args()[i])->cast<ArrayLit>();
-        nonFixedVars += al->v().size();
-        for (unsigned int j=al->v().size(); j--;) {
-          if (al->v()[j]->type().ispar())
+        nonFixedVars += al->size();
+        for (unsigned int j=al->size(); j--;) {
+          if (al->element(j)->type().ispar())
             nonFixedVars--;
         }
       }
@@ -1334,15 +1335,15 @@ namespace MiniZinc {
           for (unsigned int i=0; i<c->args().size(); i++) {
             bool unit = (i==0 ? isConjunction : !isConjunction);
             ArrayLit* al = follow_id(c->args()[i])->cast<ArrayLit>();
-            realNonFixed += al->v().size();
-            for (unsigned int j=al->v().size(); j--;) {
-              if (al->v()[j]->type().ispar() || al->v()[j]->cast<Id>()->decl()->ti()->domain())
+            realNonFixed += al->size();
+            for (unsigned int j=al->size(); j--;) {
+              if (al->element(j)->type().ispar() || al->element(j)->cast<Id>()->decl()->ti()->domain())
                 realNonFixed--;
-              if (al->v()[j]->type().ispar() && eval_bool(env,al->v()[j]) != unit) {
+              if (al->element(j)->type().ispar() && eval_bool(env,al->element(j)) != unit) {
                 subsumed = true;
                 i=2; // break out of outer loop
                 break;
-              } else if (Id* id = al->v()[j]->dyn_cast<Id>()) {
+              } else if (Id* id = al->element(j)->dyn_cast<Id>()) {
                 if (id->decl()->ti()->domain()) {
                   bool idv = (id->decl()->ti()->domain()==constants().lit_true);
                   if (unit != idv) {
@@ -1397,7 +1398,7 @@ namespace MiniZinc {
             // not subsumed, nonfixed==1
             assert(nonfixed_i != -1);
             ArrayLit* al = follow_id(c->args()[nonfixed_i])->cast<ArrayLit>();
-            Id* id = al->v()[nonfixed_j]->cast<Id>();
+            Id* id = al->element(nonfixed_j)->cast<Id>();
             if (ci || vdi->e()->ti()->domain()) {
               bool result = nonfixed_i==0;
               if (vdi && vdi->e()->ti()->domain()==constants().lit_false)
@@ -1420,19 +1421,19 @@ namespace MiniZinc {
           ArrayLit* al = follow_id(c->args()[posOrNeg])->cast<ArrayLit>();
           ArrayLit* al_other = follow_id(c->args()[1-posOrNeg])->cast<ArrayLit>();
           
-          if (ci && al->v().size()==1 && al->v()[0]!=vd->id() && al_other->v().size()==1) {
+          if (ci && al->size()==1 && al->element(0)!=vd->id() && al_other->size()==1) {
             // simple implication
             assert(al_other->v()[0]==vd->id());
             if (ci) {
-              if (al->v()[0]->type().ispar()) {
-                if (eval_bool(env,al->v()[0])==isTrue) {
+              if (al->element(0)->type().ispar()) {
+                if (eval_bool(env,al->element(0))==isTrue) {
                   toRemove.push_back(ci);
                 } else {
                   env.fail();
                   remove = false;
                 }
               } else {
-                Id* id = al->v()[0]->cast<Id>();
+                Id* id = al->element(0)->cast<Id>();
                 if (id->decl()->ti()->domain()==NULL) {
                   id->decl()->ti()->domain(constants().boollit(isTrue));
                   vardeclQueue.push_back(env.vo.idx.find(id->decl()->id())->second);
@@ -1448,8 +1449,8 @@ namespace MiniZinc {
             }
           } else {
             // proper clause
-            for (unsigned int i=0; i<al->v().size(); i++) {
-              if (al->v()[i]==vd->id()) {
+            for (unsigned int i=0; i<al->size(); i++) {
+              if (al->element(i)==vd->id()) {
                 if (ci) {
                   toRemove.push_back(ci);
                 } else {

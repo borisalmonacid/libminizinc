@@ -159,7 +159,7 @@ minizinc_to_python(VarDecl* vd)
     // next item to be put onto the final array
     unsigned int currentPos = 0;
     do {
-      PyList_SetItem(p[i], d[i], one_dim_minizinc_to_python(al->v()[currentPos], type));
+      PyList_SetItem(p[i], d[i], one_dim_minizinc_to_python(al->element([currentPos]), type));
       currentPos++;
       d[i]++;
       while (d[i]>=dmax[i] && i>0) {

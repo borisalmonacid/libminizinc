@@ -19,7 +19,7 @@ namespace MiniZinc {
   void CLIOptions::setStringVectorParam(const std::string& name, KeepAlive ka) {
    Expression* e = ka();
     if(ArrayLit* al = e->dyn_cast<ArrayLit>()) {
-      ASTExprVec<Expression> vec = al->v();
+      ASTExprVec<Expression> vec = al->_v;
       if(vec.size() > 0 && vec[0]->type().ispar() && vec[0]->type().isstring()) {
         _options[name] = e;
         return;
@@ -45,7 +45,7 @@ namespace MiniZinc {
   std::vector<std::string> CLIOptions::getStringVectorParam(const std::string& name) const {
     if(hasParam(name)) {
       if(ArrayLit* al = getParam(name)->dyn_cast<ArrayLit>()) {    
-        ASTExprVec<Expression> vec = al->v();
+        ASTExprVec<Expression> vec = al->_v;
         if(vec.size() > 0 && vec[0]->type().isstring()) {
           std::vector<std::string> v;
           for(unsigned int i=0; i<vec.size(); i++)
@@ -62,7 +62,7 @@ namespace MiniZinc {
   std::vector<std::string> CLIOptions::getStringVectorParam(const std::string& name, std::vector<std::string>& def) const {
     if(hasParam(name)) {
       if(ArrayLit* al = getParam(name)->dyn_cast<ArrayLit>()) {    
-        ASTExprVec<Expression> vec = al->v();
+        ASTExprVec<Expression> vec = al->_v;
         if(vec.size() > 0 && vec[0]->type().isstring()) {
           std::vector<std::string> v;
           for(unsigned int i=0; i<vec.size(); i++)

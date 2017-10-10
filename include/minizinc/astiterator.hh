@@ -184,7 +184,7 @@ namespace MiniZinc {
             pushVec(stack, ce->template cast<SetLit>()->v());
             break;
           case Expression::E_ARRAYLIT:
-            pushVec(stack, ce->template cast<ArrayLit>()->v());
+            pushVec(stack, ce->template cast<ArrayLit>()->_v);
             break;
           case Expression::E_ARRAYACCESS:
             pushVec(stack, ce->template cast<ArrayAccess>()->idx());
@@ -285,7 +285,7 @@ namespace MiniZinc {
         break;
         case Expression::E_ARRAYLIT:
         _t.vArrayLit(*e->template cast<ArrayLit>());
-        pushVec(stack, e->template cast<ArrayLit>()->v());
+        pushVec(stack, e->template cast<ArrayLit>()->_v);
         break;
         case Expression::E_ARRAYACCESS:
         _t.vArrayAccess(*e->template cast<ArrayAccess>());

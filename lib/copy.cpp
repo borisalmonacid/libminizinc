@@ -228,17 +228,18 @@ namespace MiniZinc {
         m.insert(e,c);
 
         ASTExprVecO<Expression*>* v;
-        if (ASTExprVecO<Expression*>* cv = m.find(al->v())) {
+        if (ASTExprVecO<Expression*>* cv = m.find(al->_v)) {
           v = cv;
         } else {
-          std::vector<Expression*> elems(al->v().size());
-          for (unsigned int i=al->v().size(); i--;)
-            elems[i] = copy(env,m,al->v()[i],followIds,copyFundecls,isFlatModel);
+          std::vector<Expression*> elems(al->size());
+          for (unsigned int i=al->size(); i--;)
+            elems[i] = copy(env,m,al->element(i),followIds,copyFundecls,isFlatModel);
           ASTExprVec<Expression> ce(elems);
-          m.insert(al->v(),ce);
+          m.insert(al->_v,ce);
           v = ce.vec();
         }
-        c->v(ASTExprVec<Expression>(v));
+        //c->v(ASTExprVec<Expression>(v));
+        c->_v = v;
         ret = c;
       }
       break;

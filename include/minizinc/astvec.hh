@@ -80,7 +80,7 @@ namespace MiniZinc {
     /// Element access
     T*& operator[](unsigned int i);
     /// Element access
-    const T* operator[](unsigned int i) const;
+    T* operator[](unsigned int i) const;
     /// Iterator begin
     T** begin(void);
     /// Iterator end
@@ -219,7 +219,7 @@ namespace MiniZinc {
     return (*_v)[i];
   }
   template<class T>
-  inline const T*
+  inline T*
   ASTExprVec<T>::operator[](unsigned int i) const {
     return (*_v)[i];
   }

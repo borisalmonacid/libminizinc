@@ -225,9 +225,9 @@ bool Solns2Out::__evalOutput( ostream& fout ) {
 //     GCLock lock;
 //     ArrayLit* al = eval_array_lit(pEnv->envi(),outputExpr);
 //     std::string os;
-//     cerr << " al->size() == " << al->v().size() << endl;
-//     for (unsigned int i=0; i<al->v().size(); i++) {
-//       std::string s = eval_string(pEnv->envi(),al->v()[i]);
+//     cerr << " al->size() == " << al->size() << endl;
+//     for (unsigned int i=0; i<al->size(); i++) {
+//       std::string s = eval_string(pEnv->envi(),al->element(i));
 //       if (!s.empty()) {
 //         os = s;
 //         cerr << os;

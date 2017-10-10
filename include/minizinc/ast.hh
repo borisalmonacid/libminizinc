@@ -585,12 +585,11 @@ namespace MiniZinc {
   /// \brief Array literal expression
   class ArrayLit : public Expression {
     friend class Expression;
-  protected:
+  public:
     /// The array
     ASTExprVec<Expression> _v;
     /// The declared array dimensions
     ASTIntVec _dims;
-  public:
     /// The identifier of this expression type
     static const ExpressionId eid = E_ARRAYLIT;
     /// Constructor
@@ -613,10 +612,11 @@ namespace MiniZinc {
     /// Recompute hash value
     void rehash(void);
     
-    /// Access value
-    ASTExprVec<Expression> v(void) const { return _v; }
-    /// Set value
-    void v(const ASTExprVec<Expression>& val) { _v = val; }
+    /// New access value 
+    Expression* element(int index) const { return _v[index]; }
+    
+    /// Return the size of _v
+    int size(void) const { return _v.size(); }
 
     /// Return number of dimensions
     int dims(void) const;
